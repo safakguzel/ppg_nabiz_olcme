@@ -1,0 +1,62 @@
+//Arduino Kodları:
+
+void setup() {
+  Serial.begin(9600);
+}
+void loop() {
+  Serial.println(analogRead(0));
+  delay(50);
+}
+
+//Processing 2 Kodları:
+
+import processing.serial.*;
+    Serial myPort;
+    int xPos = 1;
+    float oldHeartrateHeight = 0;
+
+    void setup () {
+    // pencere ölçüsü ayarı:
+    size(1000, 400);
+    frameRate(30);
+
+    // kullanılabilir seri portları listele.
+    println(Serial.list());
+
+    // Hangi seri port kullanılacaksa kurulur.
+    // Bu aşama farklı bilgisayarlar için değişebilir.
+    myPort = new Serial(this, Serial.list()[0], 9600);
+
+    // başlangıç arkaplan ayarı:
+    background(0);
+    }
+
+    void draw () {
+    }
+
+    void serialEvent (Serial myPort) {
+    // seri porttan string verileri oku.
+    String inString = myPort.readStringUntil('\n');
+
+    if (inString != null) {
+    // herhangi beyaz alanları kırp:
+    inString = trim(inString);
+    // int verisine çevir
+    println(inString);
+    int currentHeartrate = int(inString);
+
+    // nabız BPM grafiğini çiz.
+    float heartrateHeight = map(currentHeartrate, 0, 1023, 0, height);
+    stroke(0,255,0);
+    line(xPos - 1, height - oldHeartrateHeight, xPos, height - heartrateHeight);
+    oldHeartrateHeight = heartrateHeight;
+    // ekranın son köşesine gelidiğinde ekranın başından başla:
+    if (xPos >= width) {
+    xPos = 0;
+    background(0);
+    } else {
+    // yatay pozisyonu arttır:
+    xPos++;
+    }
+    }
+    }
